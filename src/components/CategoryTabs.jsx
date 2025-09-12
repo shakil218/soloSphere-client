@@ -1,6 +1,7 @@
 import React from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+import JobsCard from "./JobsCard";
 
 const CategoryTabs = () => {
   return (
@@ -18,7 +19,7 @@ const CategoryTabs = () => {
         </div>
 
         <TabPanel>
-          <h2>Any content 1</h2>
+          <JobsCard></JobsCard>
         </TabPanel>
         <TabPanel>
           <h2>Any content 2</h2>
