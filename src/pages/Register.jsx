@@ -1,9 +1,37 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import loginLottieFile from "../assets/lottie/register.json";
 import Lottie from "lottie-react";
+import UseAuth from "../hooks/UseAuth";
+import toast from "react-hot-toast";
 
 const Register = () => {
+  const { createNewUser, updateUser } = UseAuth();
+  const navigate = useNavigate();
+
+  const handleCreateUser = (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const name = form.name.value;
+    const email = form.email.value;
+    const password = form.password.value;
+    const photo = form.photo.value;
+    const updateData = { displayName: name, photoURL: photo };
+    console.log(name,email,password,photo);
+
+    createNewUser(email, password)
+      .then((result) => {
+        updateUser(updateData);
+        toast.success(`User successfully login`);
+        navigate("/")
+        console.log(result);
+      })
+      .catch((error) => {
+        toast.error(error.code);
+        console.log(error.code);
+      });
+  };
+
   return (
     <div className="flex flex-col justify-center items-center mt-10">
       <div className="text-center mx-3">
@@ -69,79 +97,80 @@ const Register = () => {
             <span className="w-1/5 border-b dark:border-gray-400 lg:w-1/4"></span>
           </div>
 
-          {/* UserName field */}
-          <div className="mt-4">
-            <label
-              className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <input
-              id="name"
-              autoComplete="name"
-              name="name"
-              className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-              type="text"
-            />
-          </div>
-          {/* photo_Url field */}
-          <div className="mt-4">
-            <label
-              className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-              htmlFor="photo"
-            >
-              Photo url
-            </label>
-            <input
-              id="photo"
-              autoComplete="photo"
-              name="photo"
-              className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-              type="url"
-            />
-          </div>
-          {/* Email field */}
-          <div className="mt-4">
-            <label
-              className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-              htmlFor="LoggingEmailAddress"
-            >
-              Email Address
-            </label>
-            <input
-              id="LoggingEmailAddress"
-              autoComplete="email"
-              name="email"
-              className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-              type="email"
-            />
-          </div>
-          {/* password field */}
-          <div className="mt-4">
-            <div className="flex justify-between">
+          <form onSubmit={handleCreateUser}>
+            {/* UserName field */}
+            <div className="mt-4">
               <label
                 className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                htmlFor="loggingPassword"
+                htmlFor="name"
               >
-                Password
+                Name
               </label>
+              <input
+                id="name"
+                autoComplete="name"
+                name="name"
+                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
+                type="text"
+              />
             </div>
+            {/* Email field */}
+            <div className="mt-4">
+              <label
+                className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
+                htmlFor="LoggingEmailAddress"
+              >
+                Email Address
+              </label>
+              <input
+                id="LoggingEmailAddress"
+                autoComplete="email"
+                name="email"
+                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
+                type="email"
+              />
+            </div>
+            {/* password field */}
+            <div className="mt-4">
+              <div className="flex justify-between">
+                <label
+                  className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
+                  htmlFor="loggingPassword"
+                >
+                  Password
+                </label>
+              </div>
 
-            <input
-              id="loggingPassword"
-              autoComplete="current-password"
-              name="password"
-              className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-              type="password"
-            />
-          </div>
-
-          <div className="mt-6">
-            <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
-              Sign Up
-            </button>
-          </div>
+              <input
+                id="loggingPassword"
+                autoComplete="current-password"
+                name="password"
+                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
+                type="password"
+              />
+            </div>
+            {/* photo_Url field */}
+            <div className="mt-4">
+              <label
+                className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
+                htmlFor="photo"
+              >
+                Photo url
+              </label>
+              <input
+                id="photo"
+                autoComplete="photo"
+                name="photo"
+                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
+                type="url"
+              />
+            </div>
+            <div className="mt-6">
+              <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
+                Sign Up
+              </button>
+            </div>
+          </form>
 
           <div className="flex items-center justify-between mt-4">
             <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
