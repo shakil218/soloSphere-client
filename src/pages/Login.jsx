@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import loginLottieFile from "../assets/lottie/register.json";
 import Lottie from "lottie-react";
@@ -8,12 +8,14 @@ import toast, { Toaster } from "react-hot-toast";
 const Login = () => {
   const { signInUser, signInWithGoogle } = UseAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state || "/";
 
   const handleSignInWithGoogle = () => {
     signInWithGoogle()
       .then((result) => {
         toast.success(`User successfully login`);
-        navigate("/");
+        navigate(from);
         console.log(result);
       })
       .catch((error) => {
@@ -29,7 +31,7 @@ const Login = () => {
     signInUser(email, password)
       .then((result) => {
         toast.success(`User successfully login`);
-        navigate('/')
+        navigate(from);
         console.log(result);
       })
       .catch((error) => {

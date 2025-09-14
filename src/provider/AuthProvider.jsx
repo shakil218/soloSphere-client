@@ -12,7 +12,7 @@ import {
 import auth from "../firebase/firebase.init";
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const provider = new GoogleAuthProvider();
 
@@ -43,6 +43,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setLoading(false);
       setUser(currentUser);
       console.log("state captured", currentUser);
     });

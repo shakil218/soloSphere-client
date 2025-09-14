@@ -8,48 +8,69 @@ import AddJobs from "../pages/AddJobs";
 import MyPostedJobs from "../pages/MyPostedJobs";
 import MyBids from "../pages/MyBids";
 import BidRequests from "../pages/BidRequests";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
-    path:"/",
-    element:<MainLayout></MainLayout>,
-    errorElement:`404
+    path: "/",
+    element: <MainLayout></MainLayout>,
+    errorElement: `404
     Page not found.`,
-    children:[
+    children: [
       {
-        index:true,
-        element:<Home></Home>
+        index: true,
+        element: <Home></Home>,
       },
       {
-        path:"/job-details",
-        element:<JobDetails></JobDetails>
+        path: "/job-details",
+        element: (
+          <PrivateRoute>
+            <JobDetails></JobDetails>
+          </PrivateRoute>
+        ),
       },
       {
-        path:"/add-jobs",
-        element:<AddJobs></AddJobs>
+        path: "/add-jobs",
+        element: (
+          <PrivateRoute>
+            <AddJobs></AddJobs>
+          </PrivateRoute>
+        ),
       },
       {
-        path:"/my-posted-jobs",
-        element:<MyPostedJobs></MyPostedJobs>
+        path: "/my-posted-jobs",
+        element: (
+          <PrivateRoute>
+            <MyPostedJobs></MyPostedJobs>
+          </PrivateRoute>
+        ),
       },
       {
-        path:"/my-bids",
-        element:<MyBids></MyBids>
+        path: "/my-bids",
+        element: (
+          <PrivateRoute>
+            <MyBids></MyBids>
+          </PrivateRoute>
+        ),
       },
       {
-        path:"/bid-requests",
-        element:<BidRequests></BidRequests>
+        path: "/bid-requests",
+        element: (
+          <PrivateRoute>
+            <BidRequests></BidRequests>
+          </PrivateRoute>
+        ),
       },
       {
-        path:"/login",
-        element:<Login></Login>
+        path: "/login",
+        element: <Login></Login>,
       },
       {
-        path:"/register",
-        element:<Register></Register>
+        path: "/register",
+        element: <Register></Register>,
       },
-    ]
-  }
-])
+    ],
+  },
+]);
 
 export default router;

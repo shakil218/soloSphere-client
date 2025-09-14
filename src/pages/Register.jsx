@@ -6,8 +6,20 @@ import UseAuth from "../hooks/UseAuth";
 import toast from "react-hot-toast";
 
 const Register = () => {
-  const { createNewUser, updateUser } = UseAuth();
+  const { signInWithGoogle,createNewUser, updateUser } = UseAuth();
   const navigate = useNavigate();
+
+  const handleSignInWithGoogle = () => {
+    signInWithGoogle()
+      .then((result) => {
+        toast.success(`User successfully login`);
+        navigate("/");
+        console.log(result.user);
+      })
+      .catch((error) => {
+        toast.error(error.code);
+      });
+  };
 
   const handleCreateUser = (event) => {
     event.preventDefault();
@@ -58,6 +70,7 @@ const Register = () => {
           </p>
 
           <a
+            onClick={handleSignInWithGoogle}
             href="#"
             className="flex items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg dark:border-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
