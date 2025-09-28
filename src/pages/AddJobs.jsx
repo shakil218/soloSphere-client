@@ -1,134 +1,152 @@
-import React from "react";
+import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import toast from "react-hot-toast";
+import UseAuth from "../hooks/UseAuth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AddJobs = () => {
-  return (
-    <div className="my-5">
-      <h1 className="text-3xl font-bold md:text-5xl text-center">
-        Add a new Job
-      </h1>
-      <form onSubmit={"handleAddJob"} className="card-body">
-        <fieldset className="fieldset">
-          {/* column 1 */}
-          {/* Title */}
-          <div className="">
-            <label className="label">Title</label>
-            <input
-              type="text"
-              name="title"
-              className="input w-full"
-              placeholder="Title"
-              required
-            />
-          </div>
-          {/* column 2 */}
-          {/* Email */}
-          <div className="">
-            <label className="label">Email</label>
-            <input
-              defaultValue={""}
-              type="email"
-              name="email"
-              className="input w-full"
-              placeholder="Email"
-              required
-            />
-          </div>
+  const { user } = UseAuth();
+  const navigate = useNavigate();
+  const [startDate, setStartDate] = useState(new Date());
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const job_title = form.job_title.value;
+    const email = form.email.value;
+    const deadline = startDate;
+    const category = form.category.value;
+    const min_price = parseFloat(form.min_price.value);
+    const max_price = parseFloat(form.max_price.value);
+    const description = form.description.value;
+    const jobData = {
+      job_title,
+      deadline,
+      category,
+      min_price,
+      max_price,
+      description,
+      buyer: {
+        email,
+        name: user?.displayName,
+        photo: user?.photoURL,
+      },
+    };
+    try {
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jobs`,
+        jobData
+      );
+      console.log(data);
+      toast.success("Job Data added Successfully!");
+      navigate("/my-posted-jobs");
+    } catch (err) {
+      console.log(err);
+      toast.error(err.massage)
+    }
+  };
 
-          {/* column 3 */}
-          {/* job description */}
-          <div>
-            <fieldset className="fieldset">
-              <legend className="text-gray-500">Description</legend>
-              <textarea
-                className="textarea w-full"
-                name="description"
-                placeholder="Description"
-                required
-              ></textarea>
-            </fieldset>
-          </div>
-          {/* column 4 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-3">
-            {/*Job Category */}
+  return (
+    <div className="flex justify-center items-center min-h-[calc(100vh-306px)] my-12">
+      <section className=" p-2 md:p-6 mx-auto bg-white rounded-md shadow-md ">
+        <h2 className="text-lg font-semibold text-gray-700 capitalize ">
+          Post a Job
+        </h2>
+
+        <form onSubmit={handleFormSubmit}>
+          <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
             <div>
-              <fieldset className="fieldset">
-                <legend className="text-gray-500">Category</legend>
-                <select
-                  defaultValue="Pick a job category"
-                  name="category"
-                  className="select w-full"
-                  required
-                >
-                  <option disabled={true}>Pick a job category</option>
-                  <option>Web Developer</option>
-                  <option>Graphics Design</option>
-                  <option>Digital Marketing</option>
-                </select>
-              </fieldset>
-            </div>
-            {/*Application deadline */}
-            <div>
-              <label className="label">Application Deadline</label>
+              <label className="text-gray-700 " htmlFor="job_title">
+                Job Title
+              </label>
               <input
-                type="date"
-                name="applicationDeadline"
-                className="input w-full"
-                placeholder="Application Deadline"
-                required
+                id="job_title"
+                name="job_title"
+                type="text"
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-700 " htmlFor="emailAddress">
+                Email Address
+              </label>
+              <input
+                id="emailAddress"
+                type="email"
+                name="email"
+                disabled
+                defaultValue={user?.email}
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              />
+            </div>
+            <div className="flex flex-col gap-2 ">
+              <label className="text-gray-700">Deadline</label>
+
+              {/* Date Picker Input Field */}
+              <DatePicker
+                className="block w-full px-4 py-2  text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2 ">
+              <label className="text-gray-700 " htmlFor="category">
+                Category
+              </label>
+              <select
+                name="category"
+                id="category"
+                className="border p-2 rounded-md"
+              >
+                <option value="Web Developer">Web Developer</option>
+                <option value="Graphics Design">Graphics Design</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-gray-700 " htmlFor="min_price">
+                Minimum Price
+              </label>
+              <input
+                id="min_price"
+                name="min_price"
+                type="number"
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-700 " htmlFor="max_price">
+                Maximum Price
+              </label>
+              <input
+                id="max_price"
+                name="max_price"
+                type="number"
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
               />
             </div>
           </div>
-          {/* column 8 */}
-          <div>
-            <label>Salary Range</label>
-            <div className="grid grid-cols-1 lg:grid-cols-3 items-center gap-3">
-              {/* minimum salary range */}
-              <div className="">
-                <label className="label">min</label>
-                <input
-                  type="number"
-                  name="min"
-                  className="input w-full"
-                  placeholder="min"
-                  required
-                />
-              </div>
-              {/* maximum salary range */}
-              <div className="">
-                <label className="label">max</label>
-                <input
-                  type="number"
-                  name="max"
-                  className="input w-full"
-                  placeholder="max"
-                  required
-                />
-              </div>
-              {/* salary currency */}
-
-              <fieldset className="fieldset">
-                <legend className="text-gray-500">Currency</legend>
-                <select
-                  defaultValue="Pick a salary currency"
-                  name="currency"
-                  className="select w-full"
-                >
-                  <option disabled={true}>Pick a salary currency</option>
-                  <option>bdt</option>
-                  <option>us-dollar</option>
-                  <option>euro</option>
-                  <option>dinar</option>
-                  <option>dirham</option>
-                </select>
-              </fieldset>
-            </div>
+          <div className="flex flex-col gap-2 mt-4">
+            <label className="text-gray-700 " htmlFor="description">
+              Description
+            </label>
+            <textarea
+              className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              name="description"
+              id="description"
+            ></textarea>
           </div>
-          {/* Submit Button */}
-          <button className="btn btn-neutral">
-            Submit
-          </button>
-        </fieldset>
-      </form>
+          <div className="flex justify-end mt-6">
+            <button className="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transhtmlForm bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
+              Save
+            </button>
+          </div>
+        </form>
+      </section>
     </div>
   );
 };

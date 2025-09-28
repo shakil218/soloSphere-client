@@ -1,65 +1,169 @@
-import React from "react";
+import React, { useState } from "react";
+import { useLoaderData } from "react-router-dom";
+import UseAuth from "../hooks/UseAuth";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const JobDetails = () => {
+  const [startDate, setStartDate] = useState(new Date());
+  const { user } = UseAuth();
+  const job = useLoaderData();
+  const {
+    _id,
+    job_title,
+    category,
+    deadline,
+    description,
+    min_price,
+    max_price,
+    buyer,
+  } = job || [];
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    if (user?.email === buyer?.email)
+      return toast.error("Acton not permitted.");
+    const form = event.target;
+    const price = parseFloat(form.price.value);
+    if (price < parseFloat(min_price))
+      return toast.error("Offer more or at least equal to Minimum Price.");
+    const comment = form.comment.value;
+    const deadline = startDate;
+    const email = user?.email;
+    const status = "pending";
+    const job_id = _id;
+    const buyer_email = buyer?.email;
+    const bidData = {
+      job_id,
+      job_title,
+      category,
+      price,
+      deadline,
+      email,
+      comment,
+      buyer_email,
+      status,
+    };
+
+    try {
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/bid`,
+        bidData
+      );
+      toast.success("🎉 Bid placed successfully! Best of luck with the job!");
+      console.log(data);
+    } catch (error) {
+      // Code to handle the error
+      toast.error("Failed to place bid. Please try again.");
+      console.log("An error occurred:", error.message);
+    }
+  };
+
   return (
-    <div className="flex justify-center items-center my-10">
-      <div class="max-w-2xl px-8 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-light text-gray-600 dark:text-gray-400">
-            Mar 10, 2019
+    <div className="flex flex-col md:flex-row justify-around gap-5  items-stretch min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto my-10">
+      {/* Job Details */}
+      <div className="flex-1 flex flex-col px-4 py-7 bg-white rounded-md shadow-md md:min-h-[350px]">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-light text-gray-800 ">Deadline: {new Date(deadline).toLocaleDateString()}</span>
+          <span className="px-4 py-1 text-xs text-blue-800 uppercase bg-blue-200 rounded-full ">
+            {category}
           </span>
-          <a
-            class="px-3 py-1 text-sm font-bold text-gray-100 transition-colors duration-300 transform bg-gray-600 rounded cursor-pointer hover:bg-gray-500"
-            tabindex="0"
-            role="button"
-          >
-            Design
-          </a>
         </div>
 
-        <div class="mt-2">
-          <a
-            href="#"
-            class="text-xl font-bold text-gray-700 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 hover:underline"
-            tabindex="0"
-            role="link"
-          >
-            Accessibility tools for designers and developers
-          </a>
-          <p class="mt-2 text-gray-600 dark:text-gray-300">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tempora
-            expedita dicta totam aspernatur doloremque. Excepturi iste iusto eos
-            enim reprehenderit nisi, accusamus delectus nihil quis facere in
-            modi ratione libero!
+        <div>
+          <h1 className="mt-2 text-3xl font-semibold text-gray-800 ">
+            {job_title}
+          </h1>
+
+          <p className="mt-2 text-lg text-gray-600 ">{description}</p>
+          <p className="mt-6 text-sm font-bold text-gray-600 ">
+            Buyer Details:
+          </p>
+          <div className="flex items-center gap-5">
+            <div>
+              <p className="mt-2 text-sm  text-gray-600 ">{buyer?.name}</p>
+              <p className="mt-2 text-sm  text-gray-600 ">
+                {buyer?.email}
+              </p>
+            </div>
+            <div className="rounded-full object-cover overflow-hidden w-14 h-14">
+              <img src={buyer?.photo} alt="" />
+            </div>
+          </div>
+          <p className="mt-6 text-lg font-bold text-gray-600 ">
+            Range: ${min_price} - ${max_price}
           </p>
         </div>
-
-        <div class="flex items-center justify-between mt-4">
-          <a
-            href="#"
-            class="text-blue-600 dark:text-blue-400 hover:underline"
-            tabindex="0"
-            role="link"
-          >
-            Read more
-          </a>
-
-          <div class="flex items-center">
-            <img
-              class="hidden object-cover w-10 h-10 mx-4 rounded-full sm:block"
-              src="https://images.unsplash.com/photo-1502980426475-b83966705988?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=40&q=80"
-              alt="avatar"
-            />
-            <a
-              class="font-bold text-gray-700 cursor-pointer dark:text-gray-200"
-              tabindex="0"
-              role="link"
-            >
-              Khatab wedaa
-            </a>
-          </div>
-        </div>
       </div>
+      {/* Place A Bid Form */}
+      <section className="flex-1 flex flex-col p-6 w-full  bg-white rounded-md shadow-md md:min-h-[350px]">
+        <h2 className="text-lg font-semibold text-gray-700 capitalize ">
+          Place A Bid
+        </h2>
+
+        <form onSubmit={handleFormSubmit}>
+          <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+            <div>
+              <label className="text-gray-700 " htmlFor="price">
+                Price
+              </label>
+              <input
+                id="price"
+                type="text"
+                name="price"
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-700 " htmlFor="emailAddress">
+                Email Address
+              </label>
+              <input
+                id="emailAddress"
+                type="email"
+                name="email"
+                defaultValue={user?.email}
+                disabled
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-700 " htmlFor="comment">
+                Comment
+              </label>
+              <input
+                id="comment"
+                name="comment"
+                type="text"
+                className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+              />
+            </div>
+            <div className="flex flex-col gap-2 ">
+              <label className="text-gray-700">Deadline</label>
+
+              {/* Date Picker Input Field */}
+              <DatePicker
+                className="block w-full px-4 py-2  text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring"
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button
+              type="submit"
+              className="px-8 py-2.5 leading-5 text-white transition-colors duration-300 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+            >
+              Place Bid
+            </button>
+          </div>
+        </form>
+      </section>
     </div>
   );
 };

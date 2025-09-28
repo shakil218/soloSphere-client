@@ -22,12 +22,13 @@ const router = createBrowserRouter([
         element: <Home></Home>,
       },
       {
-        path: "/job-details",
+        path: "/jobs/:id",
         element: (
           <PrivateRoute>
             <JobDetails></JobDetails>
           </PrivateRoute>
         ),
+        loader:({params}) => fetch(`${import.meta.env.VITE_API_URL}/jobs/${params.id}`)
       },
       {
         path: "/add-jobs",
